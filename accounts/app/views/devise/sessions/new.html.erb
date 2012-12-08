@@ -1,6 +1,10 @@
 <h2>Sign in</h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
+  <% if redirect_url? %>
+    <%= hidden_field_tag :redirect, redirect_url %>
+  <% end %>
+
   <div><%= f.label :email %><br />
   <%= f.email_field :email %></div>
 
