@@ -23,6 +23,7 @@ end
 gem 'jquery-rails'
 
 gem 'devise'
+gem 'songkick-oauth2-provider'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

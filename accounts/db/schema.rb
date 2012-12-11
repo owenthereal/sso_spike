@@ -11,7 +11,39 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121207173648) do
+ActiveRecord::Schema.define(:version => 20121210174711) do
+
+  create_table "oauth2_authorizations", :force => true do |t|
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
+    t.string   "oauth2_resource_owner_type"
+    t.integer  "oauth2_resource_owner_id"
+    t.integer  "client_id"
+    t.string   "scope"
+    t.string   "code",                       :limit => 40
+    t.string   "access_token_hash",          :limit => 40
+    t.string   "refresh_token_hash",         :limit => 40
+    t.datetime "expires_at"
+  end
+
+  add_index "oauth2_authorizations", ["access_token_hash"], :name => "index_oauth2_authorizations_on_access_token_hash", :unique => true
+  add_index "oauth2_authorizations", ["client_id", "code"], :name => "index_oauth2_authorizations_on_client_id_and_code", :unique => true
+  add_index "oauth2_authorizations", ["client_id", "oauth2_resource_owner_type", "oauth2_resource_owner_id"], :name => "index_owner_client_pairs", :unique => true
+  add_index "oauth2_authorizations", ["client_id", "refresh_token_hash"], :name => "index_oauth2_authorizations_on_client_id_and_refresh_token_hash", :unique => true
+
+  create_table "oauth2_clients", :force => true do |t|
+    t.datetime "created_at",               :null => false
+    t.datetime "updated_at",               :null => false
+    t.string   "oauth2_client_owner_type"
+    t.integer  "oauth2_client_owner_id"
+    t.string   "name"
+    t.string   "client_id"
+    t.string   "client_secret_hash"
+    t.string   "redirect_uri"
+  end
+
+  add_index "oauth2_clients", ["client_id"], :name => "index_oauth2_clients_on_client_id", :unique => true
+  add_index "oauth2_clients", ["name"], :name => "index_oauth2_clients_on_name", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
