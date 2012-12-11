@@ -3,8 +3,6 @@ class ApplicationController < ActionController::Base
   before_filter :authenticate_user!
 
   def authenticate_user!
-    session[:client_id] = "exerqejjm9dyzhl9kbgk16so42fldu2"
-
     logger.debug "TODO"
     logger.debug session.inspect
     logger.debug Marshal.load(Base64.decode64(cookies["_accounts_session"])).inspect
@@ -28,7 +26,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :user_signed_in?
   def user_signed_in?
-    account_session.key?("warden.user.user.key")
+    accounts_cookies.key?("warden.user.user.key") && accounts_cookies.key?("auth_token")
   end
 
   helper_method :current_url
@@ -45,7 +43,7 @@ class ApplicationController < ActionController::Base
   end
 
   def auth_token
-    account_session["auth_token"]
+    accounts_cookies["auth_token"]
   end
 
   helper_method :sign_up_url
@@ -73,7 +71,7 @@ class ApplicationController < ActionController::Base
     "#{request.protocol}accounts.#{request.domain}#{request.port_string}"
   end
 
-  def account_session
-    @account_session ||= Marshal.load(Base64.decode64(cookies["_accounts_session"]))
+  def accounts_cookies
+    @accounts_cookies ||= Marshal.load(Base64.decode64(cookies["_accounts_session"]))
   end
 end
