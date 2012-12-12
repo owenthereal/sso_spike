@@ -7,19 +7,33 @@ class ApplicationController < ActionController::Base
     logger.debug session.inspect
   end
 
-  def after_sign_in_path_for(resource_or_scope)
-    oauth2 = Songkick::OAuth2::Provider.parse(current_user, request)
-    logger.debug oauth2.inspect
+  def sign_in(*args)
+    result = super
 
-    if oauth2.valid? && same_domain?(oauth2.redirect_uri)
-      oauth2.grant_access!
-      session[:auth_token] = oauth2.access_token
-    else
-      oauth2.deny_access!
-      session.delete(:auth_token)
+    if user_signed_in?
+      if oauth.valid? && same_domain?(oauth.redirect_uri)
+        oauth.grant_access!
+        cookies[:code] = {
+          value: oauth.code
+        }
+      else
+        oauth.deny_access!
+        cookies.delete(:code)
+      end
     end
 
-    oauth2.client.try(:redirect_uri) || super(resource_or_scope)
+    result
+  end
+
+  def sign_out(*args)
+    result = super
+    cookies.delete(:code)
+
+    result
+  end
+
+  def after_sign_in_path_for(resource_or_scope)
+    redirect_uri || super(resource_or_scope)
   end
 
   def after_sign_out_path_for(resource_or_scope)
@@ -30,20 +44,17 @@ class ApplicationController < ActionController::Base
     redirect_uri || super(resource_or_scope)
   end
 
-  helper_method :redirect_uri
   def redirect_uri
-    @redirect_uri ||= begin
-                        if params[:redirect_uri]
-                          uri = URI.parse(params[:redirect_uri]).to_s
-                          regex = /^.+\.#{request.domain.gsub('.', '\.')}/
-                          uri =~ regex && uri
-                        end
-                      end
+    @redirect_uri ||= oauth.valid? ? oauth.client.redirect_uri : nil
   end
 
-  helper_method :redirect_uri?
   def redirect_uri?
     redirect_uri.present?
+  end
+
+  helper_method :oauth
+  def oauth
+    @oauth ||= Songkick::OAuth2::Provider.parse(current_user, request)
   end
 
   private

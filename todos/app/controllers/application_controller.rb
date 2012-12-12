@@ -64,7 +64,7 @@ class ApplicationController < ActionController::Base
   private
 
   def accounts_auth_url_for(path)
-    "#{accounts_url}/users/#{path}?redirect_uri=#{current_url}&client_id=#{client_id}&response_type=token"
+    "#{accounts_url}/users/#{path}?redirect_uri=#{current_url}&client_id=#{client_id}&response_type=code"
   end
 
   def accounts_url
