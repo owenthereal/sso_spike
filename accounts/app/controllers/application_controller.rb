@@ -27,10 +27,8 @@ class ApplicationController < ActionController::Base
   end
 
   def sign_out(*args)
-    result = super
-    cookies.delete(:code, domain: :all) if result
-
-    result
+    cookies.delete(:code, domain: :all)
+    super
   end
 
   def after_sign_in_path_for(resource_or_scope)
