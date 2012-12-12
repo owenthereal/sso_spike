@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
         }
       else
         oauth.deny_access!
-        cookies.delete(:code)
+        cookies.delete(:code, domain: :all)
       end
     end
 
@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
 
   def sign_out(*args)
     result = super
-    cookies.delete(:code)
+    cookies.delete(:code, domain: :all) if result
 
     result
   end
