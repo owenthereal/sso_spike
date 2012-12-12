@@ -60,3 +60,6 @@ module Accounts
     config.assets.version = '1.0'
   end
 end
+
+require 'songkick/oauth2/provider'
+Songkick::OAuth2::Provider.realm = 'My OAuth app'

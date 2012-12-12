@@ -8,6 +8,15 @@
 </head>
 <body>
 
+<h1>Todos app</h1>
+
+<% if user_signed_in? %>
+  Signed in as <%= current_user.email %>. Not you?
+  <%= link_to "Sign out", sign_out_url, :method => :delete %>
+<% else %>
+  <%= link_to "Sign up", sign_up_url %> or <%= link_to "sign in", sign_in_url %>
+<% end %>
+
 <%= yield %>
 
 </body>
