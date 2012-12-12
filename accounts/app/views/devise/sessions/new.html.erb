@@ -1,4 +1,4 @@
-<h2>Sign in</h2>
+<h2>Sign in to <%= oauth_app_name ? oauth_app_name : "Accounts" %></h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
 
