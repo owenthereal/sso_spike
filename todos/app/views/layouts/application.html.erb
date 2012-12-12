@@ -8,6 +8,8 @@
 </head>
 <body>
 
+<h1>Todos app</h1>
+
 <% if user_signed_in? %>
   Signed in as <%= current_user.email %>. Not you?
   <%= link_to "Sign out", sign_out_url, :method => :delete %>
