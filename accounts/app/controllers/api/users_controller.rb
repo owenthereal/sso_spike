@@ -1,5 +1,5 @@
 module Api
-  class UsersController < ApplicationController
+  class UsersController < ::Api::ApplicationController
     def current
       render json: current_user
     end

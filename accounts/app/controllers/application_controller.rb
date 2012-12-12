@@ -14,7 +14,8 @@ class ApplicationController < ActionController::Base
       if oauth.valid? && same_domain?(oauth.redirect_uri)
         oauth.grant_access!
         cookies[:code] = {
-          value: oauth.code
+          value: oauth.code,
+          domain: :all
         }
       else
         oauth.deny_access!
@@ -45,11 +46,12 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_uri
-    @redirect_uri ||= oauth.valid? ? oauth.client.redirect_uri : nil
-  end
+    @redirect_uri ||= begin
+                        result = oauth.valid? ? oauth.client.redirect_uri : nil
+                        result ||= params[:redirect_uri] && same_domain?(params[:redirect_uri]) ? params[:redirect_uri] : nil
 
-  def redirect_uri?
-    redirect_uri.present?
+                        result
+                      end
   end
 
   helper_method :oauth
