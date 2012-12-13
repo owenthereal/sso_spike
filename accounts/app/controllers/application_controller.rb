@@ -59,6 +59,11 @@ class ApplicationController < ActionController::Base
                         result = oauth.valid? ? oauth.client.redirect_uri : nil
                         result ||= params[:redirect_uri] && same_domain?(params[:redirect_uri]) ? params[:redirect_uri] : nil
 
+                        if result
+                          result = "#{result}?code=#{oauth.code}" if oauth.code
+                          result = "#{result}&state=#{params[:state]}" if params[:state]
+                        end
+
                         result
                       end
   end

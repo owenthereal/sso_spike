@@ -53,6 +53,8 @@ Todos::Application.routes.draw do
   # just remember to delete public/index.html.
   root :to => 'tasks#index'
 
+  match '/auth/acl/callback', to: 'sessions#create'
+
   # See how all your routes lay out with "rake routes"
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.

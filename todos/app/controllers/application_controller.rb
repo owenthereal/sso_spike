@@ -11,30 +11,32 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
   def current_user
-    require 'ostruct'
-    @current_user = OpenStruct.new
+    @current_user ||= begin
+                        require 'ostruct'
+                        current_user = OpenStruct.new
+                        current_user.email = session[:user_email]
+                        current_user
 
-    if code
-      require "net/http"
-      uri = URI.parse("#{accounts_url}/login/oauth/access_token.json")
-      resp = Net::HTTP.post_form(uri, {
-        client_id: client_id,
-        client_secret: client_secret,
-        code: code
-      })
-      logger.debug resp.inspect
+                        #if code
+                          #require "net/http"
+                          #uri = URI.parse("#{accounts_url}/login/oauth/access_token.json")
+                          #resp = Net::HTTP.post_form(uri, {
+                            #client_id: client_id,
+                            #client_secret: client_secret,
+                            #code: code
+                          #})
+                          #logger.debug resp.inspect
 
-      access_token = JSON.parse(resp.body)["access_token"]
-      uri = URI.parse("#{accounts_url}/api/user.json?oauth_token=#{CGI.escape(access_token)}")
-      resp = Net::HTTP.get_response(uri)
+                          #access_token = JSON.parse(resp.body)["access_token"]
+                          #uri = URI.parse("#{accounts_url}/api/user.json?oauth_token=#{CGI.escape(access_token)}")
+                          #resp = Net::HTTP.get_response(uri)
 
-      logger.debug resp.inspect
-      @current_user.email = JSON.parse(resp.body)["email"]
-    else
-      @current_user.email = "unknown"
-    end
-
-    @current_user
+                          #logger.debug resp.inspect
+                          #current_user.email = JSON.parse(resp.body)["email"]
+                        #else
+                          #current_user.email = "unknown"
+                        #end
+                      end
   end
 
   helper_method :user_signed_in?
@@ -62,7 +64,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :sign_in_url
   def sign_in_url
-    accounts_auth_url_for(:sign_in)
+    "/auth/acl"
   end
 
   helper_method :sign_out_url

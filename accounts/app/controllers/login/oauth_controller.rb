@@ -6,18 +6,18 @@ module Login
         && (req = request_for(request.env, client.redirect_uri)) \
         && (auth = validate_authorization(authorization.owner, req))
 
-        resp_hash = response_hash(auth.access_token)
+        resp_hash = response_hash(auth.response_body)
 
         respond_to do |format|
-          format.html { render text: to_text(resp_hash) }
-          format.json { render json: resp_hash }
+          format.html { render text: to_text(resp_hash), content_type: "application/x-www-form-urlencoded" }
+          format.json { render json: resp_hash, content_type: "application/json" }
         end
       else
         error_msg = "Credentials are invalid"
 
         respond_to do |format|
-          format.html { render text: error_msg, status: :unauthorized }
-          format.json { render json: { error: error_msg }, status: :unauthorized }
+          format.html { render text: error_msg, status: :unauthorized, content_type: "application/x-www-form-urlencoded" }
+          format.json { render json: { error: error_msg }, status: :unauthorized, content_type: "application/json" }
         end
       end
     end
@@ -34,7 +34,10 @@ module Login
     end
 
     def validate_code(client, code)
-      client.authorizations.where(code: params[:code]).first
+      auth = client.authorizations.where(code: params[:code]).first
+      logger.debug "Can't find authorization for #{code}" unless auth
+
+      auth
     end
 
     def request_for(env, redirect_uri)
@@ -49,12 +52,16 @@ module Login
       if auth.valid?
         auth
       else
+        logger.debug "Invalid request: #{auth.inspect}"
         nil
       end
     end
 
-    def response_hash(access_token)
-      { access_token: access_token, token_type: "bearer"}
+    def response_hash(body)
+      json = JSON.parse(body)
+      #json[:token_type] = "bearer"
+
+      json
     end
 
     def to_text(hash)
